@@ -1,0 +1,9 @@
+{
+  "name": "as-alexa-alaskaair",
+  "version": "0.0.0",
+  "description": "as-alexa-alaskaair",
+  "main": "server.js",
+  "author": {
+    "name": "mikel"
+  }
+}
