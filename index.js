@@ -9,11 +9,10 @@ app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
 app.use(function (req, res, next) {
-    /*
     if (!req.headers || !req.headers.signaturecertchainurl) {
+        console.log("something wrong w/req");
         return next();
     }
-    */
 
     req._body = true;
     req.rawBody = '';
