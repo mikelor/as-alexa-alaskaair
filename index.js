@@ -41,12 +41,14 @@ var alexaApp = new alexa.app('alaska-agent');
 alexaApp.express(app, "/api/");
 
 //make sure our app is only being launched by the correct application (our Amazon Alexa app)
+/*
 alexaApp.pre = function (request, response, type) {
     if (request.sessionDetails.application.applicationId != "amzn1.ask.skill.50cae8cf-d04b-467f-96c0-80c9db6d0256") {
         // Fail ungracefully 
         response.fail("Invalid applicationId");
     }
 };
+*/
 
 //our intent that is launched when "Hey Alexa, open Hey Dad" command is made
 //since our app only has the one function (tell a bad joke), we will just do that when it's launched
