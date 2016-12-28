@@ -36,13 +36,13 @@ app.use(function (req, res, next) {
 //what we say when we can't find a matching joke
 var jokeFailed = "Sorry, your old dad's memory ain't what it used to be. Try me with another.";
 
-//create and assign our Alexa App instance to an address on express, in this case https://hey-dad.herokuapp.com/api/hey-dad
-var alexaApp = new alexa.app('hey-dad');
+//create and assign our Alexa App instance to an address on express, in this case https://as-alexa-alaskaair-662ykhdrpzmom.azurewebsites.net/api/alaska-agent
+var alexaApp = new alexa.app('alaska-agent');
 alexaApp.express(app, "/api/");
 
 //make sure our app is only being launched by the correct application (our Amazon Alexa app)
 alexaApp.pre = function (request, response, type) {
-    if (request.sessionDetails.application.applicationId != "amzn1.echo-sdk-ams.app.440526a5-4703-4886-87eb-d09a6e9eaf13") {
+    if (request.sessionDetails.application.applicationId != "amzn1.ask.skill.50cae8cf-d04b-467f-96c0-80c9db6d0256") {
         // Fail ungracefully 
         response.fail("Invalid applicationId");
     }
