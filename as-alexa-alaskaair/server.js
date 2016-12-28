@@ -21,7 +21,7 @@
 /**
  * App ID for the skill
  */
-var APP_ID = "amzn1.echo-sdk-ams.app.as-alex-alaskaair";
+var APP_ID = "amzn1.ask.skill.50cae8cf-d04b-467f-96c0-80c9db6d0256";
 
 /**
  * The AlexaSkill prototype and helper functions
