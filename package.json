@@ -5,7 +5,7 @@
   "main": "server.js",
   "dependencies": {
     "alexa-app": "2.3.4",
-    "body-parser": "^1.15.2",
+    "alexa-verifier": "0.0.5",
     "ejs": "^2.5.5",
     "express": "^4.14.0"
   }

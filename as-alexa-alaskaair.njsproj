@@ -11,7 +11,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>a2bf0a00-18c1-496f-b12e-e3ed80be9b19</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>server.js</StartupFile>
+    <StartupFile>index.js</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -30,7 +30,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AlexaSkill.js" />
-    <Compile Include="server.js" />
+    <Compile Include="index.js" />
     <Content Include="IISNode.yml" />
     <Content Include="package.json" />
     <Content Include="README.md" />
