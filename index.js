@@ -9,22 +9,36 @@ app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
 app.use(function (req, res, next) {
+    /*
+    if (!req.headers || !req.headers.signaturecertchainurl) {
+        return next();
+    }
+    */
+
     req._body = true;
     req.rawBody = '';
-
     req.on('data', function (data) {
+        console.log("[" + data + "]");
         return req.rawBody += data;
     });
 
     return req.on('end', function () {
         var cert_url, er, requestBody, signature;
         try {
-            console.log(req.rawBody);
+            console.log("raw body");
             req.body = JSON.parse(req.rawBody);
         } catch (_error) {
             er = _error;
             req.body = {};
+            console.log("error found");
         }
+
+        /*
+        cert_url = req.headers.signaturecertchainurl;
+        signature = req.headers.signature;
+        */
+
+        requestBody = req.rawBody;
     });
 });
 
@@ -36,13 +50,24 @@ var jokeFailed = "Sorry, your old dad's memory ain't what it used to be. Try me 
 var alexaApp = new alexa.app("alaska-agent");
 alexaApp.express(app, "/api/");
 
+//make sure our app is only being launched by the correct application (our Amazon Alexa app)
+alexaApp.pre = function (request, response, type) {
+    /*
+    if (request.sessionDetails.application.applicationId != "amzn1.ask.skill.50cae8cf-d04b-467f-96c0-80c9db6d0256") {
+        // Fail ungracefully 
+        response.fail("Invalid applicationId");
+    }
+    */
+};
+
 //our intent that is launched when "Hey Alexa, open Hey Dad" command is made
 //since our app only has the one function (tell a bad joke), we will just do that when it's launched
 alexaApp.launch(function (request, response) {
     //log our app launch
     console.log("App launched");
-    response.card("The App Was Launched");
-    response.say("The App Launched Succesfully");
+
+    response.card("App Successfully Launched");
+    response.say("App Successfully Launched");
     response.send();
 
 });
