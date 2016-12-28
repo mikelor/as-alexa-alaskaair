@@ -2,7 +2,7 @@
 var express = require('express');
 var alexa = require('alexa-app');
 var app = express();
-verifier = require('alexa-verifier');
+var verifier = require('alexa-verifier');
 
 app.set('port', (process.env.PORT || 5000));
 app.use(express.static('public'));
@@ -29,17 +29,6 @@ app.use(function (req, res, next) {
         cert_url = req.headers.signaturecertchainurl;
         signature = req.headers.signature;
         requestBody = req.rawBody;
-        return verifier(cert_url, signature, requestBody, function (er) {
-            if (er) {
-                console.error('error validating the alexa cert:', er);
-                return res.status(401).json({
-                    status: 'failure',
-                    reason: er
-                });
-            } else {
-                return next();
-            }
-        });
     });
 });
 
