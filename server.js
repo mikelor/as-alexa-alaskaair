@@ -1,79 +1,207 @@
-/**
-    Copyright 2014-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+var express = require('express')
+    , app = express()
+    , server = require('http').createServer(app)
+    , port = process.env.PORT || 3000
+    , fs = require('fs')
+    , util = require('util')
+    , https = require('https');
 
-    Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
+// https://as-alexaecho.scm.azurewebsites.net/api/logstream
 
-        http://aws.amazon.com/apache2.0/
+// Creates the website server on the port #
+server.listen(port, function () {
+    console.log('Server listening at port %d', port);
+});
 
-    or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
-*/
+// configure Express
+app.set('views', __dirname + '/views');
+app.set('view engine', 'html');
 
-/**
- * This simple sample has no external dependencies or session management, and shows the most basic
- * example of how to create a Lambda function for handling Alexa Skill requests.
- *
- * Examples:
- * One-shot model:
- *  User: "Alexa, tell Hello World to say hello"
- *  Alexa: "Hello World!"
- */
+// Express Routing
+app.use(express.static(__dirname + '/public'));
+app.engine('html', require('ejs').renderFile);
 
-/**
- * App ID for the skill
- */
-var APP_ID = "amzn1.ask.skill.50cae8cf-d04b-467f-96c0-80c9db6d0256";
-
-/**
- * The AlexaSkill prototype and helper functions
- */
-var AlexaSkill = require('./AlexaSkill');
-
-/**
- * HelloWorld is a child of AlexaSkill.
- * To read more about inheritance in JavaScript, see the link below.
- *
- * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Introduction_to_Object-Oriented_JavaScript#Inheritance
- */
-var HelloWorld = function () {
-    AlexaSkill.call(this, APP_ID);
+// Helper function to format the strings so that they don't include spaces and are all lowercase 
+var FormatString = function (string) {
+    var lowercaseString = string.toLowerCase();
+    var formattedString = lowercaseString.replace(/\s/g, '');
+    return formattedString;
 };
 
-// Extend AlexaSkill
-HelloWorld.prototype = Object.create(AlexaSkill.prototype);
-HelloWorld.prototype.constructor = HelloWorld;
+function performRequest(endpoint, method, data, success) {
+    var dataString = JSON.stringify(data);
+    var headers = {};
 
-HelloWorld.prototype.eventHandlers.onSessionStarted = function (sessionStartedRequest, session) {
-    console.log("HelloWorld onSessionStarted requestId: " + sessionStartedRequest.requestId
-        + ", sessionId: " + session.sessionId);
-    // any initialization logic goes here
-};
-
-HelloWorld.prototype.eventHandlers.onLaunch = function (launchRequest, session, response) {
-    console.log("HelloWorld onLaunch requestId: " + launchRequest.requestId + ", sessionId: " + session.sessionId);
-    var speechOutput = "Welcome to the Alexa Skills Kit, you can say hello";
-    var repromptText = "You can say hello";
-    response.ask(speechOutput, repromptText);
-};
-
-HelloWorld.prototype.eventHandlers.onSessionEnded = function (sessionEndedRequest, session) {
-    console.log("HelloWorld onSessionEnded requestId: " + sessionEndedRequest.requestId
-        + ", sessionId: " + session.sessionId);
-    // any cleanup logic goes here
-};
-
-HelloWorld.prototype.intentHandlers = {
-    // register custom intent handlers
-    "HelloWorldIntent": function (intent, session, response) {
-        response.tellWithCard("Hello World!", "Hello World", "Hello World!");
-    },
-    "AMAZON.HelpIntent": function (intent, session, response) {
-        response.ask("You can say hello to me!", "You can say hello to me!");
+    if (method == 'GET') {
+        endpoint += '?' + querystring.stringify(data);
     }
-};
+    else {
+        headers = {
+            'Content-Type': 'application/json',
+            'Content-Length': dataString.length
+        };
+    }
+    var options = {
+        host: 'askjenn.alaskaair.com',
+        path: endpoint,
+        method: method,
+        headers: headers
+    };
 
-// Create the handler that responds to the Alexa Request.
-exports.handler = function (event, context) {
-    // Create an instance of the HelloWorld skill.
-    var helloWorld = new HelloWorld();
-    helloWorld.execute(event, context);
-};
+    var req = https.request(options, function (res) {
+        res.setEncoding('utf-8');
+
+        var responseString = '';
+
+        res.on('data', function (data) {
+            responseString += data;
+        });
+
+        res.on('end', function () {
+            console.log(responseString);
+            var responseObject = JSON.parse(responseString);
+            console.log("responseObject = [" + responseObject + "]");
+            console.log("responseObject.text =(" + responseObject.text + ")");
+            success(responseObject);
+        });
+    });
+
+    req.write(dataString);
+    req.end();
+}
+
+// Handles the route for echo apis
+app.post('/api/echo', function (req, res) {
+    console.log("received echo request");
+    var requestBody = "";
+
+    // Will accumulate the data
+    req.on('data', function (data) {
+        requestBody += data;
+    });
+
+    // Called when all data has been accumulated
+    req.on('end', function () {
+        var responseBody = {};
+        console.log(requestBody);
+        console.log(JSON.stringify(requestBody));
+
+        // parsing the requestBody for information
+        var jsonData = JSON.parse(requestBody);
+        if (jsonData.request.type == "LaunchRequest") {
+            // crafting a response
+            responseBody = {
+                "version": "0.1",
+                "response": {
+                    "outputSpeech": {
+                        "type": "PlainText",
+                        "text": "Welcome to Echo Sample! Please say a command"
+                    },
+                    "card": {
+                        "type": "Simple",
+                        "title": "Opened",
+                        "content": "You started the Node.js Echo API Sample"
+                    },
+                    "reprompt": {
+                        "outputSpeech": {
+                            "type": "PlainText",
+                            "text": "Say a command"
+                        }
+                    },
+                    "shouldEndSession": false
+                }
+            };
+        }
+        else if (jsonData.request.type == "IntentRequest") {
+            var outputSpeechText = "";
+            var cardContent = "";
+
+            console.log('Received Intent Request {%s}', jsonData.request.intent.name);
+
+            if (jsonData.request.intent.name == "AskQuestion") {
+                // The Intent "TurnOn" was successfully called
+                // outputSpeechText = "Congrats! You asked to turn on " + jsonData.request.intent.slots.Question.value + " but it was not implemented";
+                cardContent = "Successfully called " + jsonData.request.intent.name + ", but it's not implemented!";
+                var jennResponse;
+
+                performRequest(
+                    '/AlmeApi/api/Conversation/converse',
+                    'POST',
+                    {
+                        question: jsonData.request.intent.slots.Question.value,
+                        origin: 'Typed',
+                        parameters: {},
+                        channel: 'Alexa'
+                    },
+                    function (jennResponse) {
+                        var responseString = JSON.stringify(jennResponse);
+                        console.log("[" + responseString + "]");
+                        outputSpeechText = jennResponse.text;
+                        cardContent = "Successfully called " + jsonData.request.intent.name + ", but it's not implemented!";
+                        console.log("jennResponse.Text =[" + jennResponse.text + "]");
+                    }
+                );
+            }
+            else if (jsonData.request.intent.name == "TurnOn") {
+                // The Intent "TurnOn" was successfully called
+                outputSpeechText = "Congrats! You asked to turn on " + jsonData.request.intent.slots.Device.value + " but it was not implemented";
+                cardContent = "Successfully called " + jsonData.request.intent.name + ", but it's not implemented!";
+            }
+            else if (jsonData.request.intent.name == "TurnOff") {
+                // The Intent "TurnOff" was successfully called
+                outputSpeechText = "Congrats! You asked to turn off " + jsonData.request.intent.slots.Device.value + " but it was not implemented";
+                cardContent = "Successfully called " + jsonData.request.intent.name + ", but it's not implemented!";
+            } else {
+                outputSpeechText = jsonData.request.intent.name + " not implemented";
+                cardContent = "Successfully called " + jsonData.request.intent.name + ", but it's not implemented!";
+            }
+
+            // Debug
+            console.log("outputSpeech (" + outputSpeechText + ")");
+            console.log("cardContent (" + cardContent + ")");
+
+            responseBody = {
+                "version": "0.1",
+                "response": {
+                    "outputSpeech": {
+                        "type": "PlainText",
+                        "text": outputSpeechText
+                    },
+                    "card": {
+                        "type": "Simple",
+                        "title": "Open Smart Hub",
+                        "content": cardContent
+                    },
+                    "shouldEndSession": false
+                }
+            };
+        } else {
+            // Not a recognized type
+            responseBody = {
+                "version": "0.1",
+                "response": {
+                    "outputSpeech": {
+                        "type": "PlainText",
+                        "text": "Could not parse data"
+                    },
+                    "card": {
+                        "type": "Simple",
+                        "title": "Error Parsing",
+                        "content": JSON.stringify(requestBody)
+                    },
+                    "reprompt": {
+                        "outputSpeech": {
+                            "type": "PlainText",
+                            "text": "Say a command"
+                        }
+                    },
+                    "shouldEndSession": false
+                }
+            };
+        }
+
+        res.statusCode = 200;
+        res.contentType('application/json');
+        res.send(responseBody);
+    });
+});
