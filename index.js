@@ -33,7 +33,7 @@ app.use(function (req, res, next) {
 var jokeFailed = "Sorry, your old dad's memory ain't what it used to be. Try me with another.";
 
 //create and assign our Alexa App instance to an address on express, in this case https://as-alexa-alaskaair-662ykhdrpzmom.azurewebsites.net/api/alaska-agent
-var alexaApp = new alexa.app('alaska-agent');
+var alexaApp = new alexa.app("alaska-agent");
 alexaApp.express(app, "/api/");
 
 //our intent that is launched when "Hey Alexa, open Hey Dad" command is made
@@ -41,17 +41,8 @@ alexaApp.express(app, "/api/");
 alexaApp.launch(function (request, response) {
     //log our app launch
     console.log("App launched");
-
-    //our joke which we share to both the companion app and the Alexa device
-    var joke = getJoke();
-    //if we failed to get a joke, apologize
-    if (!joke) {
-        joke = jokeFailed;
-    } else {
-        //only display it in the companion app if we have a joke
-        response.card(joke);
-    }
-    response.say(joke);
+    response.card("The App Was Launched");
+    response.say("The App Launched Succesfully");
     response.send();
 
 });
