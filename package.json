@@ -1,9 +1,10 @@
 {
   "name": "as-alexa-alaskaair",
-  "version": "0.0.0",
-  "description": "as-alexa-alaskaair",
+  "version": "0.0.1",
+  "description": "A server that can be hosted and responds to echo api calls",
   "main": "server.js",
-  "author": {
-    "name": "mikel"
+  "dependencies": {
+    "express": "4.12.3",
+    "ejs": "2.3.1"
   }
 }
