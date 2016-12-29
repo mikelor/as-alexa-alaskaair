@@ -84,7 +84,6 @@ alexaApp.intent('TellMeAJoke', {
     "utterances": ["Tell me a joke", "Get me a joke", "A joke", "Tell me {another|} joke", "What does the dad say", "Make me laugh.", "{That's|You're} not funny", "Ha ha ha", "Very funny", "That's so {corny|lame|stupid}"]
 },
     function (request, response) {
-        /*
         //our joke which we share to both the companion app and the Alexa device
         var joke = getJoke();
         //if we failed to get a joke, apologize
@@ -92,18 +91,9 @@ alexaApp.intent('TellMeAJoke', {
             joke = jokeFailed;
         } else {
             //only display it in the companion app if we have a joke
-            response.card(joke);
+            response.card("joke", joke);
         }
         response.say(joke);
-        response.send();
-        */
-        response.card({
-            "type": "Simple",
-            "title": "Horoscope",
-            "content": "Today will provide you a new learning opportunity.  Stick with it and the possibilities will be endless."
-        });
-        
-        response.say("It's really a good joke");
         response.send();
     });
 
