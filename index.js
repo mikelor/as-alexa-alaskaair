@@ -97,7 +97,12 @@ alexaApp.intent('TellMeAJoke', {
         response.say(joke);
         response.send();
         */
-        response.card("testing card");
+        response.card({
+            "type": "Simple",
+            "title": "Horoscope",
+            "content": "Today will provide you a new learning opportunity.  Stick with it and the possibilities will be endless."
+        });
+        
         response.say("It's really a good joke");
         response.send();
     });
