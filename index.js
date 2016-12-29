@@ -94,6 +94,8 @@ alexaApp.intent("AskJennIntent",
             "How much"]
     },
     function (request, response) {
+        console.log("In the AskJennIntent");
+
         var jennResponse;
 
         performRequest(
