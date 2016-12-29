@@ -14,8 +14,8 @@ app.set('view engine', 'ejs');
 app.use(
     function (req, res, next) {
         if (!req.headers || !req.headers.signaturecertchainurl) {
-            console.log("failed to find headers");
-            return next();
+              console.log("failed to find headers");
+            //return next();
         }
 
         req._body = true;
@@ -109,7 +109,10 @@ alexaApp.intent("AskJennIntent",
                 channel: 'Alexa'
             },
             function (jennResponse) {
+                console.log("in jenn response handler");
+
                 var responseString = JSON.stringify(jennResponse);
+
                 console.log("[" + responseString + "]");
                 outputSpeechText = jennResponse.text;
                 response.say(jennResponse.text);
@@ -178,6 +181,8 @@ alexaApp.intent('IntentAbout', {
 // performRequest
 //
 function performRequest(host, endpoint, method, data, success) {
+    console.log("In performRequest");
+
     var dataString = JSON.stringify(data);
     var headers = {};
 
@@ -190,6 +195,7 @@ function performRequest(host, endpoint, method, data, success) {
             'Content-Length': dataString.length
         };
     }
+
     var options = {
         host: host,
         path: endpoint,
@@ -197,26 +203,41 @@ function performRequest(host, endpoint, method, data, success) {
         headers: headers
     };
 
-    var req = https.request(options, function (res) {
-        res.setEncoding('utf-8');
+    console.log("before https.request");
 
-        var responseString = '';
+    var req = https.request(options,
+        function (res) {
+            console.log("in https function handler");
 
-        res.on('data', function (data) {
-            responseString += data;
-        });
+            res.setEncoding('utf-8');
 
-        res.on('end', function () {
-            console.log(responseString);
-            var responseObject = JSON.parse(responseString);
-            console.log("responseObject = [" + responseObject + "]");
-            console.log("responseObject.text =(" + responseObject.text + ")");
-            success(responseObject);
-        });
-    });
+            var responseString = '';
 
+            res.on('data',
+                function (data) {
+                    console.log("getting data");
+                    responseString += data;
+                }
+            );
+
+            res.on('end',
+                function () {
+                    console.log(responseString);
+                    var responseObject = JSON.parse(responseString);
+                    console.log("responseObject = [" + responseObject + "]");
+                    console.log("responseObject.text =(" + responseObject.text + ")");
+                    success(responseObject);
+                }
+            );
+        }
+   );
+
+
+    console.log("before writing request");
     req.write(dataString);
     req.end();
+
+    console.log("ending request");
 }
 
 
