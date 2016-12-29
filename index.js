@@ -1,43 +1,51 @@
 //initialize express
 var express = require('express');
 var alexa = require('alexa-app');
-var app = express();
 var verifier = require('alexa-verifier');
 
+var app = express();
 app.set('port', (process.env.PORT || 5000));
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
 app.use(function (req, res, next) {
     if (!req.headers || !req.headers.signaturecertchainurl) {
-        console.log("something wrong w/req");
+        console.log("failed to find headers");
         return next();
     }
 
     req._body = true;
     req.rawBody = '';
     req.on('data', function (data) {
-        console.log("[" + data + "]");
+        console.log("data=[" + data + "]");
         return req.rawBody += data;
     });
-
     return req.on('end', function () {
         var cert_url, er, requestBody, signature;
         try {
-            console.log("raw body");
+            console.log("req.body=[" + req.rawbody + "]");
             req.body = JSON.parse(req.rawBody);
         } catch (_error) {
             er = _error;
+            console.log("error");
             req.body = {};
-            console.log("error found");
         }
-
-        /*
+        
         cert_url = req.headers.signaturecertchainurl;
         signature = req.headers.signature;
-        */
-
         requestBody = req.rawBody;
+
+        return verifier(cert_url, signature, requestBody, function (er) {
+            if (er) {
+                console.error('error validating the alexa cert:', er);
+                return res.status(401).json({
+                    status: 'failure',
+                    reason: er
+                });
+            } else {
+                return next();
+            }
+        });
     });
 });
 
@@ -51,12 +59,10 @@ alexaApp.express(app, "/api/");
 
 //make sure our app is only being launched by the correct application (our Amazon Alexa app)
 alexaApp.pre = function (request, response, type) {
-    /*
     if (request.sessionDetails.application.applicationId != "amzn1.ask.skill.50cae8cf-d04b-467f-96c0-80c9db6d0256") {
         // Fail ungracefully 
         response.fail("Invalid applicationId");
     }
-    */
 };
 
 //our intent that is launched when "Hey Alexa, open Hey Dad" command is made
@@ -65,8 +71,17 @@ alexaApp.launch(function (request, response) {
     //log our app launch
     console.log("App launched");
 
-    response.card("App Successfully Launched");
-    response.say("App Successfully Launched");
+    //our joke which we share to both the companion app and the Alexa device
+    var joke = getJoke();
+    //if we failed to get a joke, apologize
+    if (!joke) {
+        joke = jokeFailed;
+    } else {
+        //only display it in the companion app if we have a joke
+        console.log("responding w/a joke");
+        response.card(joke);
+    }
+    response.say(joke);
     response.send();
 
 });
