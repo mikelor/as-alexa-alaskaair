@@ -118,7 +118,7 @@ alexaApp.intent("AskJennIntent",
                 outputSpeechText = jennResponse.text;
                 response.say(jennResponse.text);
                 response.card("Jenn says...", jennResponse.text);
-                response.end();
+                response.send();
             }
         );
         // return false immediately so alexa-app doesn't send the response
