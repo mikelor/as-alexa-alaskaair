@@ -97,6 +97,7 @@ alexaApp.intent('TellMeAJoke', {
         response.say(joke);
         response.send();
         */
+        response.card("testing card");
         response.say("It's really a good joke");
         response.send();
     });
