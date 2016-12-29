@@ -81,6 +81,17 @@ alexaApp.launch(
     }
 );
 
+
+app.intent("checkStatus", function (request, response) {
+    http.get("http://server.com/status.html", function (res) {
+        // this is async and will run after the http call returns
+        response.say(res.statusText);
+        // must call send to end the original request
+        response.send();
+    });
+    // return false immediately so alexa-app doesn't send the response
+    return false;
+});
 //
 // AskJenn Intent
 //
@@ -97,7 +108,9 @@ alexaApp.intent("AskJennIntent",
         console.log("In the AskJennIntent");
 
         var jennResponse;
-
+        response.say("no response necessary");
+        response.end();
+        /*
         performRequest(
             'askjenn.alaskaair.com',
             '/AlmeApi/api/Conversation/converse',
@@ -122,6 +135,7 @@ alexaApp.intent("AskJennIntent",
         );
         // return false immediately so alexa-app doesn't send the response
         return false;
+        */
     }
 );
 
