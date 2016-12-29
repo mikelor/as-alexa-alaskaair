@@ -3,6 +3,8 @@ var express = require('express');
 var alexa = require('alexa-app');
 verifier = require('alexa-verifier');
 https = require('https');
+fs = require('fs')
+util = require('util')
 
 var app = express();
 app.set('port', (process.env.PORT || 5000));
