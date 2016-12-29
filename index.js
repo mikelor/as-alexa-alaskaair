@@ -14,8 +14,8 @@ app.set('view engine', 'ejs');
 app.use(
     function (req, res, next) {
         if (!req.headers || !req.headers.signaturecertchainurl) {
-              console.log("failed to find headers");
-            //return next();
+            console.log("failed to find headers");
+            return next();
         }
 
         req._body = true;
@@ -81,42 +81,30 @@ alexaApp.launch(
     }
 );
 
-
-app.intent("checkStatus", function (request, response) {
-    http.get("http://server.com/status.html", function (res) {
-        // this is async and will run after the http call returns
-        response.say(res.statusText);
-        // must call send to end the original request
-        response.send();
-    });
-    // return false immediately so alexa-app doesn't send the response
-    return false;
-});
 //
 // AskJenn Intent
 //
 alexaApp.intent("AskJennIntent",
     {
-        "slots": {},
-        "utterances": ["What about",
-            "How do I",
-            "Where do you fly",
-            "How can I",
-            "How much"]
+        "slots": { "Question": "LITERAL" },
+        "utterances": [
+            "{Where do you fly|Question}",
+            "{bag fee|Question}",
+            "{ pets|Question}",
+            "{How can I|Question}"
+        ]
     },
     function (request, response) {
         console.log("In the AskJennIntent");
 
         var jennResponse;
-        response.say("no response necessary");
-        response.end();
-        /*
+
         performRequest(
             'askjenn.alaskaair.com',
             '/AlmeApi/api/Conversation/converse',
             'POST',
             {
-                question: jsonData.request.intent.slots.Question.value,
+                question: request.slot('Question'),
                 origin: 'Typed',
                 parameters: {},
                 channel: 'Alexa'
@@ -135,7 +123,6 @@ alexaApp.intent("AskJennIntent",
         );
         // return false immediately so alexa-app doesn't send the response
         return false;
-        */
     }
 );
 
