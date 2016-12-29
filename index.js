@@ -14,7 +14,7 @@ app.set('view engine', 'ejs');
 app.use(
     function (req, res, next) {
         if (!req.headers || !req.headers.signaturecertchainurl) {
-            console.log("failed to find headers");
+            console.log("Unable to find request headers");
             return next();
         }
 
@@ -22,7 +22,6 @@ app.use(
         req.rawBody = '';
         req.on('data',
             function (data) {
-                console.log("data=[" + data + "]");
                 return req.rawBody += data;
             }
         );
@@ -31,11 +30,11 @@ app.use(
             function () {
                 var cert_url, er, requestBody, signature;
                 try {
-                    console.log("req.body=[" + req.rawBody + "]");
+                    console.log(req.rawBody);
                     req.body = JSON.parse(req.rawBody);
                 } catch (_error) {
+                    console.log("Error encountered");
                     er = _error;
-                    console.log("error");
                     req.body = {};
                 }
         
@@ -60,11 +59,9 @@ alexaApp.express(app, "/api/");
 alexaApp.pre =
     function (request, response, type) {
         if (request.sessionDetails.application.applicationId != "amzn1.ask.skill.50cae8cf-d04b-467f-96c0-80c9db6d0256") {
-            console.log("Hmmm. This doesn't seem to be the right app");
+            console.log("Invalid ApplicationId");
             response.fail("Invalid applicationId");
         }
-
-        console.log("Looks like we're in the right spot");
     };
 
 //our intent that is launched when "Hey Alexa, open Hey Dad" command is made
@@ -95,7 +92,7 @@ alexaApp.intent("AskJennIntent",
         ]
     },
     function (request, response) {
-        console.log("In the AskJennIntent");
+        console.log("Intent: AskJenn");
 
         var jennResponse;
 
@@ -110,14 +107,11 @@ alexaApp.intent("AskJennIntent",
                 channel: 'Alexa'
             },
             function (jennResponse) {
-                console.log("in jenn response handler");
-
                 var responseString = JSON.stringify(jennResponse);
+                console.log(responseString);
 
-                console.log("[" + responseString + "]");
-                outputSpeechText = jennResponse.text;
                 response.say(jennResponse.text);
-                response.card("Jenn says...", jennResponse.text);
+                response.card("Alaska Agent", jennResponse.text + "\n" + jennResponse.navUrl.UrlAddress );
                 response.send();
             }
         );
@@ -126,44 +120,17 @@ alexaApp.intent("AskJennIntent",
     }
 );
 
-// our TellMeAJokeAbout intent, this handles specific topic queries.
-alexaApp.intent('TellMeAJokeAbout',
-    {    
-        "slots": { "TOPIC": "LITERAL" },
-        "utterances": ["Get me a joke about {a|the||} {penguin|skeleton|chickens|dracula|music|duck|elephant|Christmas|TOPIC}",
-            "Tell me a joke about {a|the||} {penguin|skeleton|chickens|dracula|music|duck|elephant|Christmas|TOPIC}",
-            "I want to hear about {a|the||} {penguin|skeleton|chickens|dracula|music|duck|elephant|Christmas|TOPIC}",
-            "What about {a|the||} {penguin|skeleton|chickens|dracula|music|duck|elephant|Christmas|TOPIC}",
-            "What do you think about {a|the||} {penguin|skeleton|chickens|dracula|music|duck|elephant|Christmas|TOPIC}",
-            "A joke about {a|the||} {penguin|skeleton|chickens|dracula|music|duck|elephant|Christmas|TOPIC}",
-            "Tell me a {topic|TOPIC} joke"]
-    },
-    function (request, response) {
-        var topic = request.slot('TOPIC');
-        var joke = getJokeAbout(topic);
-
-        //if we failed to get a joke, apologize
-        if (!joke) {
-            joke = "I couldn't find a joke about " + topic + " but here is a joke about penguins. . . " + getJokeAbout("penguin");
-        } else {
-            response.card(topic, joke);
-        }
-        response.say(joke);
-        response.send();
-    }
-);
-
-//our GoodbyeDad intent, this ends the conversation
+//our GoodbyeAgent intent, this ends the conversation
 //we'll add this back in if our app has more than one real intent
-alexaApp.intent('GoodbyeDad',
+alexaApp.intent('GoodbyeAgent',
     {
         "slots" : {},
         "utterances": ["Shut up",
             "I don't want to hear anymore",
-            "Good bye dad"]
+            "Good bye"]
     },
     function(request, response){
-		response.say("Ok then. We can chat later sport! Just say: 'Hey Dad!'");
+		response.say("Ok then. We can chat later  Just say: 'Alaska Agent'");
 		response.send();
     }
 );
@@ -174,7 +141,7 @@ alexaApp.intent('IntentAbout', {
     "utterances": ["Tell me about this app"]
     },
     function (request, response) {
-        response.say("Icons made by Freepik from www.flaticon.com. The icon is licensed by CC BY 3.0");
+        response.say("Hacked together over our Holiday break, enjoy.");
         response.send();
     });
 
@@ -182,7 +149,7 @@ alexaApp.intent('IntentAbout', {
 // performRequest
 //
 function performRequest(host, endpoint, method, data, success) {
-    console.log("In performRequest");
+    console.log("Calling Method:" + host + endpoint);
 
     var dataString = JSON.stringify(data);
     var headers = {};
@@ -204,19 +171,13 @@ function performRequest(host, endpoint, method, data, success) {
         headers: headers
     };
 
-    console.log("before https.request");
-
     var req = https.request(options,
         function (res) {
-            console.log("in https function handler");
-
             res.setEncoding('utf-8');
-
             var responseString = '';
 
             res.on('data',
                 function (data) {
-                    console.log("getting data");
                     responseString += data;
                 }
             );
@@ -225,20 +186,14 @@ function performRequest(host, endpoint, method, data, success) {
                 function () {
                     console.log(responseString);
                     var responseObject = JSON.parse(responseString);
-                    console.log("responseObject = [" + responseObject + "]");
-                    console.log("responseObject.text =(" + responseObject.text + ")");
                     success(responseObject);
                 }
             );
         }
    );
 
-
-    console.log("before writing request");
     req.write(dataString);
     req.end();
-
-    console.log("ending request");
 }
 
 
