@@ -29,7 +29,6 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AlexaSkill.js" />
     <Compile Include="index.js" />
     <Content Include="IISNode.yml" />
     <Content Include="package.json" />

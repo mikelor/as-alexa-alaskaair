@@ -78,10 +78,7 @@ alexaApp.intent("AskJennIntent",
     {
         "slots": { "Question": "LITERAL" },
         "utterances": [
-            "{Where do you fly|Question}",
-            "{bag fee|Question}",
-            "{ pets|Question}",
-            "{How can I|Question}"
+            "{Ask Jenn|Question}"
         ]
     },
     function (request, response) {
