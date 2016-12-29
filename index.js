@@ -1,7 +1,8 @@
 //initialize express
 var express = require('express');
 var alexa = require('alexa-app');
-var verifier = require('alexa-verifier');
+verifier = require('alexa-verifier');
+https = require('https');
 
 var app = express();
 app.set('port', (process.env.PORT || 5000));
@@ -66,53 +67,54 @@ alexaApp.pre =
 
 //our intent that is launched when "Hey Alexa, open Hey Dad" command is made
 //since our app only has the one function (tell a bad joke), we will just do that when it's launched
+
+//
+// Launch Intent
+//
 alexaApp.launch(
     function (request, response) {
-        //log our app launch
-        console.log("App Launched!");
-
-        //our joke which we share to both the companion app and the Alexa device
-        var joke = getJoke();
-        //if we failed to get a joke, apologize
-        if (!joke) {
-            joke = jokeFailed;
-        } else {
-            //only display it in the companion app if we have a joke
-            console.log("responding w/a joke");
-            response.card("Here's one...", joke);
-        }
-        response.say(joke);
+        response.card("Alaska Agent", "Welcome to the Alaska Airlines Agent Skill. How can I help you?");
+        response.say("Welcome to the Alaska Airlines Agent Skill. How can I help you?");
         response.send();
     }
 );
 
-// our TellMeAJoke intent, this handles the majority of our interactions.
-alexaApp.intent('TellMeAJoke',
+//
+// AskJenn Intent
+//
+alexaApp.intent("AskJennIntent",
     {
         "slots": {},
-        "utterances": ["Tell me a joke",
-            "Get me a joke",
-            "A joke",
-            "Tell me {another|} joke",
-            "What does the dad say",
-            "Make me laugh.",
-            "{That's|You're} not funny",
-            "Ha ha ha",
-            "Very funny",
-            "That's so {corny|lame|stupid}"]
+        "utterances": ["What about",
+            "How do I",
+            "Where do you fly",
+            "How can I",
+            "How much"]
     },
     function (request, response) {
-        //our joke which we share to both the companion app and the Alexa device
-        var joke = getJoke();
-        //if we failed to get a joke, apologize
-        if (!joke) {
-            joke = jokeFailed;
-        } else {
-            //only display it in the companion app if we have a joke
-            response.card("Have you heard this one?", joke);
-        }
-        response.say(joke);
-        response.send();
+        var jennResponse;
+
+        performRequest(
+            'askjenn.alaskaair.com',
+            '/AlmeApi/api/Conversation/converse',
+            'POST',
+            {
+                question: jsonData.request.intent.slots.Question.value,
+                origin: 'Typed',
+                parameters: {},
+                channel: 'Alexa'
+            },
+            function (jennResponse) {
+                var responseString = JSON.stringify(jennResponse);
+                console.log("[" + responseString + "]");
+                outputSpeechText = jennResponse.text;
+                response.say(jennResponse.text);
+                response.card("Jenn says...", jennResponse.text);
+                response.end();
+            }
+        );
+        // return false immediately so alexa-app doesn't send the response
+        return false;
     }
 );
 
@@ -167,6 +169,52 @@ alexaApp.intent('IntentAbout', {
         response.say("Icons made by Freepik from www.flaticon.com. The icon is licensed by CC BY 3.0");
         response.send();
     });
+
+//
+// performRequest
+//
+function performRequest(host, endpoint, method, data, success) {
+    var dataString = JSON.stringify(data);
+    var headers = {};
+
+    if (method == 'GET') {
+        endpoint += '?' + querystring.stringify(data);
+    }
+    else {
+        headers = {
+            'Content-Type': 'application/json',
+            'Content-Length': dataString.length
+        };
+    }
+    var options = {
+        host: host,
+        path: endpoint,
+        method: method,
+        headers: headers
+    };
+
+    var req = https.request(options, function (res) {
+        res.setEncoding('utf-8');
+
+        var responseString = '';
+
+        res.on('data', function (data) {
+            responseString += data;
+        });
+
+        res.on('end', function () {
+            console.log(responseString);
+            var responseObject = JSON.parse(responseString);
+            console.log("responseObject = [" + responseObject + "]");
+            console.log("responseObject.text =(" + responseObject.text + ")");
+            success(responseObject);
+        });
+    });
+
+    req.write(dataString);
+    req.end();
+}
+
 
 //this function gets a single joke based on a RNG
 var getJoke = function () {
