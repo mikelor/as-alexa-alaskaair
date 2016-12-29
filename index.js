@@ -34,18 +34,7 @@ app.use(function (req, res, next) {
         cert_url = req.headers.signaturecertchainurl;
         signature = req.headers.signature;
         requestBody = req.rawBody;
-
-        return verifier(cert_url, signature, requestBody, function (er) {
-            if (er) {
-                console.error('error validating the alexa cert:', er);
-                return res.status(401).json({
-                    status: 'failure',
-                    reason: er
-                });
-            } else {
-                return next();
-            }
-        });
+        return next();
     });
 });
 
@@ -243,7 +232,7 @@ app.listen(app.get('port'), function () {
 
 
 var jokeList = ["How do you know when you are going to drown in milk?... When its past your eyes!",
-    "Milk is also the fastest liquid on earth – its pasteurized before you even see it",
+    "Milk is also the fastest liquid on earth ï¿½ its pasteurized before you even see it",
     "A steak pun is a rare medium well done.",
     "Did you hear that the police have a warrant out on a midget psychic ripping people off?... It reads 'Small medium at large.'",
     "A panda walks into a bar and says to the bartender 'I'll have a Scotch and......... Coke thank you'. Sure thing the bartender replies and asks 'but what's with the big pause?...' The panda holds up his hands and says 'I was born with them'",
@@ -270,7 +259,7 @@ var jokeList = ["How do you know when you are going to drown in milk?... When it
     "Without geometry life is pointless.",
     "A termite walks into a bar and asks 'Is the bar tender here?...'",
     "What's Forest Gump's Facebook password?... 1forest1",
-    "I gave all my dead batteries away today… Free of charge.",
+    "I gave all my dead batteries away todayï¿½ Free of charge.",
     "What's the advantage of living in Switzerland?... Well, the flag is a big plus.",
     "Why did the octopus beat the shark in a fight?... Because it was well armed.",
     "A red and a blue ship have just collided in the Caribbean. Apparently the survivors are marooned.",
@@ -278,25 +267,25 @@ var jokeList = ["How do you know when you are going to drown in milk?... When it
     "What do you call a group of killer whales playing instruments?... An Orca-stra.",
     "Why was the big cat disqualified from the race?... Because it was a cheetah.",
     "A man walked in to a bar with some asphalt on his arm. He said 'Two beers please, one for me and one for the road.'",
-    "Just watched a documentary about beavers… It was the best damn program I've ever seen.",
-    "Breaking news! Energizer Bunny arrested – charged with battery.",
-    "Conjunctivitis.com – now that's a site for sore eyes.",
+    "Just watched a documentary about beaversï¿½ It was the best damn program I've ever seen.",
+    "Breaking news! Energizer Bunny arrested ï¿½ charged with battery.",
+    "Conjunctivitis.com ï¿½ now that's a site for sore eyes.",
     "A Sandwich walks into a bar, the bartender says 'Sorry, we don't serve food here'",
     "'Doctor, I've broken my arm in several places...' Doctor responds 'Well don't go to those places.'",
     "I fear for the calendar, it's days are numbered.",
     "There's a new type of broom out, it's sweeping the nation.",
     "Atheism is a non-prophet organisation.",
-    "Slept like a log last night … woke up in the fireplace.",
+    "Slept like a log last night ï¿½ woke up in the fireplace.",
     "What did the fish say when it swam into a wall?... Damn!",
     "What cheese can never be yours?... Nacho cheese.",
     "A police officer caught two kids playing with a firework and a car battery. He charged one and let the other one off.",
-    "Velcro… What a rip-off.",
+    "Velcroï¿½ What a rip-off.",
     "Where does Napoleon keep his armies?... In his sleevies.",
     "I went to the zoo the other day, there was only one dog in it. It was a shitzu.",
     "Why can't you hear a pterodactyl go to the bathroom?... The p is silent.",
     "What do you call a cow with no legs?... Ground beef.",
     "What did the Buffalo say to his little boy when he dropped him off at school?... Bison.",
-    "So a duck walks into a pharmacy and says 'Give me some chap-stick… and put it on my bill'",
+    "So a duck walks into a pharmacy and says 'Give me some chap-stickï¿½ and put it on my bill'",
     "Why did the scarecrow win an award?... Because he was outstanding in his field.",
     "Why did the girl smear peanut butter on the road?... To go with the traffic jam.",
     "Why does a chicken coop only have two doors?... Because if it had four doors it would be a chicken sedan.",
@@ -310,7 +299,7 @@ var jokeList = ["How do you know when you are going to drown in milk?... When it
     "Two muffins were sitting in an oven, and the first looks over to the second, and says, 'man, it's really hot in here'. The second looks over at the first with a surprised look, and answers, 'WHOA, a talking muffin!'",
     "A man walks into a bar and orders helicopter flavor chips. The barman replies 'sorry mate we only do plain'",
     "What do you call a sheep with no legs?... A cloud.",
-    "I knew i shouldn't have ate that seafood. Because now i'm feeling a little… Eel",
+    "I knew i shouldn't have ate that seafood. Because now i'm feeling a littleï¿½ Eel",
     "What did the late tomato say to the early tomato?... I'll ketch up",
     "What did the 0 say to the 8?... Nice belt.",
     "Why didn't the skeleton cross the road?... Because he had no guts.",
@@ -327,8 +316,8 @@ var jokeList = ["How do you know when you are going to drown in milk?... When it
     "How do you make holy water?... You boil the hell out of it.",
     "Two guys walk into a bar, the third one ducks.",
     "I had a dream that I was a muffler last night. I woke up exhausted!",
-    "5/4 of people admit that they’re bad with fractions.",
-    "Did you hear the news?... FedEx and UPS are merging. They’re going to go by the name Fed-Up from now on.",
+    "5/4 of people admit that theyï¿½re bad with fractions.",
+    "Did you hear the news?... FedEx and UPS are merging. Theyï¿½re going to go by the name Fed-Up from now on.",
     "What's the difference between a poorly dressed man on a tricycle and a well dressed man on a bicycle?... Attire",
     "Why do bears have hairy coats?... Fur protection.",
     "What do you call a fish with no eyes?... A fshhhh.",
