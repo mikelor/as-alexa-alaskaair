@@ -23,7 +23,7 @@ app.use(function (req, res, next) {
     return req.on('end', function () {
         var cert_url, er, requestBody, signature;
         try {
-            console.log("req.body=[" + req.rawbody + "]");
+            console.log("req.body=[" + req.rawBody + "]");
             req.body = JSON.parse(req.rawBody);
         } catch (_error) {
             er = _error;
