@@ -49,16 +49,18 @@ alexaApp.express(app, "/api/");
 //make sure our app is only being launched by the correct application (our Amazon Alexa app)
 alexaApp.pre = function (request, response, type) {
     if (request.sessionDetails.application.applicationId != "amzn1.ask.skill.50cae8cf-d04b-467f-96c0-80c9db6d0256") {
-        // Fail ungracefully 
+        console.log("Hmmm. This doesn't seem to be the right app");
         response.fail("Invalid applicationId");
     }
+
+    console.log("Looks like we're in the right spot");
 };
 
 //our intent that is launched when "Hey Alexa, open Hey Dad" command is made
 //since our app only has the one function (tell a bad joke), we will just do that when it's launched
 alexaApp.launch(function (request, response) {
     //log our app launch
-    console.log("App launched");
+    console.log("App Launched!");
 
     //our joke which we share to both the companion app and the Alexa device
     var joke = getJoke();
@@ -72,7 +74,6 @@ alexaApp.launch(function (request, response) {
     }
     response.say(joke);
     response.send();
-
 });
 
 //our TellMeAJoke intent, this handles the majority of our interactions.
@@ -83,6 +84,7 @@ alexaApp.intent('TellMeAJoke', {
     "utterances": ["Tell me a joke", "Get me a joke", "A joke", "Tell me {another|} joke", "What does the dad say", "Make me laugh.", "{That's|You're} not funny", "Ha ha ha", "Very funny", "That's so {corny|lame|stupid}"]
 },
     function (request, response) {
+        /*
         //our joke which we share to both the companion app and the Alexa device
         var joke = getJoke();
         //if we failed to get a joke, apologize
@@ -94,40 +96,36 @@ alexaApp.intent('TellMeAJoke', {
         }
         response.say(joke);
         response.send();
+        */
+        response.say("It's really a good joke");
+        response.send();
     });
 
 //our TellMeAJokeAbout intent, this handles specific topic queries.
-alexaApp.intent('TellMeAJokeAbout', {
-    //define our custom variables, in this case the topic of our joke
-    "slots": { "TOPIC": "LITERAL" },
-    //define our utterances, basically the whole tell me a joke
-    "utterances": ["Get me a joke about {a|the||} {penguin|skeleton|chickens|dracula|music|duck|elephant|Christmas|TOPIC}",
-        "Tell me a joke about {a|the||} {penguin|skeleton|chickens|dracula|music|duck|elephant|Christmas|TOPIC}",
-        "I want to hear about {a|the||} {penguin|skeleton|chickens|dracula|music|duck|elephant|Christmas|TOPIC}",
-        "What about {a|the||} {penguin|skeleton|chickens|dracula|music|duck|elephant|Christmas|TOPIC}",
-        "What do you think about {a|the||} {penguin|skeleton|chickens|dracula|music|duck|elephant|Christmas|TOPIC}",
-        "A joke about {a|the||} {penguin|skeleton|chickens|dracula|music|duck|elephant|Christmas|TOPIC}",
-        "Tell me a {topic|TOPIC} joke"]
-},
+alexaApp.intent('TellMeAJokeAbout',
+    {    
+        "slots": { "TOPIC": "LITERAL" },
+        "utterances": ["Get me a joke about {a|the||} {penguin|skeleton|chickens|dracula|music|duck|elephant|Christmas|TOPIC}",
+            "Tell me a joke about {a|the||} {penguin|skeleton|chickens|dracula|music|duck|elephant|Christmas|TOPIC}",
+            "I want to hear about {a|the||} {penguin|skeleton|chickens|dracula|music|duck|elephant|Christmas|TOPIC}",
+            "What about {a|the||} {penguin|skeleton|chickens|dracula|music|duck|elephant|Christmas|TOPIC}",
+            "What do you think about {a|the||} {penguin|skeleton|chickens|dracula|music|duck|elephant|Christmas|TOPIC}",
+            "A joke about {a|the||} {penguin|skeleton|chickens|dracula|music|duck|elephant|Christmas|TOPIC}",
+            "Tell me a {topic|TOPIC} joke"]
+    },
     function (request, response) {
-
-        //our topic variable from the intent
         var topic = request.slot('TOPIC');
-
-        //our joke which we share to both the companion app and the Alexa device
         var joke = getJokeAbout(topic);
+
         //if we failed to get a joke, apologize
         if (!joke) {
             joke = "I couldn't find a joke about " + topic + " but here is a joke about penguins. . . " + getJokeAbout("penguin");
         } else {
-            //only display it in the companion app if we have a joke
             response.card(joke);
         }
         response.say(joke);
         response.send();
     });
-
-
 
 //our GoodbyeDad intent, this ends the conversation
 //we'll add this back in if our app has more than one real intent
@@ -145,13 +143,10 @@ alexaApp.intent('TellMeAJokeAbout', {
 
 //our About intent, this talks about the icons we used
 alexaApp.intent('IntentAbout', {
-    //define our custom variables, in this case, none
     "slots": {},
-    //define our utterance
     "utterances": ["Tell me about this app"]
-},
+    },
     function (request, response) {
-        //thanks FlatIcon and Freepik!
         response.say("Icons made by Freepik from www.flaticon.com. The icon is licensed by CC BY 3.0");
         response.send();
     });
@@ -168,7 +163,6 @@ var getJoke = function () {
 
 //this function tries to do a dumb string match against our joke list, this is not performant
 var getJokeAbout = function (topic) {
-    //regex off final "s" "ed" or "er"
     topic = topic.replace(/(s|ed|er)$/gi, "");
 
     console.log("Our topic is: " + topic);
