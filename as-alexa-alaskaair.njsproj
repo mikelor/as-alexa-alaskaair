@@ -30,7 +30,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="index.js" />
-    <Content Include="IISNode.yml" />
     <Content Include="package.json" />
     <Content Include="README.md" />
     <Content Include="web.config" />

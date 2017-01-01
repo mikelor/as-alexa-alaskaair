@@ -17,6 +17,7 @@ app.use(
             console.log("Unable to find request headers");
             return next();
         }
+        console.log(req.headers);
 
         req._body = true;
         req.rawBody = '';
@@ -41,6 +42,9 @@ app.use(
                 cert_url = req.headers.signaturecertchainurl;
                 signature = req.headers.signature;
                 requestBody = req.rawBody;
+                return next();
+
+                /*
                 return verifier(
                     cert_url,
                     signature,
@@ -56,7 +60,7 @@ app.use(
                             return next();
                         }
                     }
-                );
+                ); */
             }
         );
     }
