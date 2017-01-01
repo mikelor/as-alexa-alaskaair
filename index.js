@@ -41,7 +41,22 @@ app.use(
                 cert_url = req.headers.signaturecertchainurl;
                 signature = req.headers.signature;
                 requestBody = req.rawBody;
-                return next();
+                return verifier(
+                    cert_url,
+                    signature,
+                    requestBody,
+                    function (er) {
+                        if (er) {
+                            console.error('error validating the alexa cert:', er);
+                            return res.status(401).json({
+                                status: 'failure',
+                                reason: er
+                            });
+                        } else {
+                            return next();
+                        }
+                    }
+                );
             }
         );
     }
