@@ -127,7 +127,7 @@ alexaApp.intent("AskJennIntent",
 
                 // Build of card response text. Include a URL if one is given
                 var responseCardText;
-                jennResponseCardText = jennResponse.text;
+                responseCardText = jennResponse.text;
                 if (!jennResponse.navUrl || !jennResponse.navUrl.UrlAddress) {
                     responseCardText += "\n" + jennResponse.navUrl.UrlAddress;
                 } 
