@@ -84,8 +84,8 @@ alexaApp.pre =
 //
 alexaApp.launch(
     function (request, response) {
-        response.card("Alaska Agent", "Welcome to the Alaska Airlines Agent Skill. How can I help you?");
-        response.say("Welcome to the Alaska Airlines Agent Skill. How can I help you?");
+        response.card("Alaska Air", "Welcome to the Alaska Air Skill. How can I help you?");
+        response.say("Welcome to the Alaska Air Skill. How can I help you?");
         response.shouldEndSession(false);
         response.send();
     }
@@ -98,9 +98,10 @@ alexaApp.intent("AskJennIntent",
     {
         "slots": { "Question": "LITERAL" },
         "utterances": [
-            "What about {bag fees|Question}",
-            "Where do {you fly|Question}",
-            "Do you {serve meals|Question}"
+            "Ask Jenn {What about bag fees|Question}",
+            "Ask Jenn {Where do you fly|Question}",
+            "Ask Jenn {Do you serve meals|Question}",
+            "Ask Jenn {Who can I talk to about reserations|Question}"
         ]
     },
     function (request, response) {
@@ -123,7 +124,14 @@ alexaApp.intent("AskJennIntent",
                 console.log(responseString);
 
                 response.say(jennResponse.text);
-                response.card("Alaska Agent", jennResponse.text + "\n" + jennResponse.navUrl.UrlAddress);
+
+                // Build of card response text. Include a URL if one is given
+                var responseCardText;
+                jennResponseCardText = jennResponse.text;
+                if (!jennResponse.navUrl || !jennResponse.navUrl.UrlAddress) {
+                    responseCardText += "\n" + jennResponse.navUrl.UrlAddress;
+                } 
+                response.card("Alaska Air", responseCardText);
 
                 response.shouldEndSession(false);
                 response.send();
@@ -144,7 +152,7 @@ alexaApp.intent('GoodbyeAgent',
             "Good bye"]
     },
     function(request, response){
-		response.say("Ok then. We can chat later  Just say: 'Alaska Agent'");
+		response.say("Ok then. We can chat later,  just say: 'Alaska Air'");
 		response.send();
     }
 );
