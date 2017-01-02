@@ -98,7 +98,9 @@ alexaApp.intent("AskJennIntent",
     {
         "slots": { "Question": "LITERAL" },
         "utterances": [
-            "{Ask Jenn|Question}"
+            "What about {bag fees|Question}",
+            "Where do {you fly|Question}",
+            "Do you {serve meals|Question}"
         ]
     },
     function (request, response) {
@@ -121,7 +123,9 @@ alexaApp.intent("AskJennIntent",
                 console.log(responseString);
 
                 response.say(jennResponse.text);
-                response.card("Alaska Agent", jennResponse.text + "\n" + jennResponse.navUrl.UrlAddress );
+                response.card("Alaska Agent", jennResponse.text + "\n" + jennResponse.navUrl.UrlAddress);
+
+                response.shouldEndSession(false);
                 response.send();
             }
         );
@@ -152,6 +156,7 @@ alexaApp.intent('IntentAbout', {
     },
     function (request, response) {
         response.say("Hacked together over our Holiday break, enjoy.");
+        response.shouldEndSession(false);
         response.send();
     });
 
