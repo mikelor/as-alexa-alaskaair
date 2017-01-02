@@ -42,8 +42,7 @@ app.use(
                 cert_url = req.headers.signaturecertchainurl;
                 signature = req.headers.signature;
                 requestBody = req.rawBody;
-                //return next();
-
+                return next();
                 
                 return verifier(
                     cert_url,
