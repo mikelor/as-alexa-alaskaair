@@ -86,6 +86,7 @@ alexaApp.launch(
     function (request, response) {
         response.card("Alaska Agent", "Welcome to the Alaska Airlines Agent Skill. How can I help you?");
         response.say("Welcome to the Alaska Airlines Agent Skill. How can I help you?");
+        response.shouldEndSession(false);
         response.send();
     }
 );
