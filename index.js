@@ -146,12 +146,14 @@ alexaApp.intent("AskJennIntent",
 alexaApp.intent('GoodbyeAgent',
     {
         "slots" : {},
-        "utterances": ["Shut up",
-            "I don't want to hear anymore",
-            "Good bye"]
+        "utterances": [
+            "Stop",
+            "Thank You",
+            "Good bye"
+        ]
     },
     function(request, response){
-		response.say("Ok then. We can chat later,  just say: 'Alaska Air'");
+		response.say("Thank you for using the Alaska Air skill.");
 		response.send();
     }
 );
@@ -159,7 +161,9 @@ alexaApp.intent('GoodbyeAgent',
 //our About intent, this talks about the icons we used
 alexaApp.intent('IntentAbout', {
     "slots": {},
-    "utterances": ["Tell me about this app"]
+    "utterances": [
+        "About this skill"
+        ]
     },
     function (request, response) {
         response.say("Hacked together over our Holiday break, enjoy.");
