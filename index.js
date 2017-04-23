@@ -178,6 +178,7 @@ function performRequest(host, endpoint, method, data, success) {
     console.log("Calling Method:" + host + endpoint);
 
     var dataString = JSON.stringify(data);
+    console.log("dataString:" + dataString);
     var headers = {};
 
     if (method == 'GET') {
